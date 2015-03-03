@@ -3,3 +3,10 @@ ios的应用自动打包、上传工具。和服务器端ipapub自动签名发�
 2、命名规则读取auto.cfg里的general段里的一些字段，按照一定的固定规则自动生成。
 3、项目依赖requests库实现上传功能，请用pip安装
 4、对于使用企业证书的签名、发布完成返回的url直接打开可以实现ipa包的安装，appstore证书的。。。
+5、项目依赖svn命令行工具获取用户名上传，如无需要修改ipa_auto的 user = getUser()部分
+6、auto.cfg详解
+	1）general段是通用设置，用于自动相关或者多处替换，比如id在这里定义了，其他段里使用{{ id }}就能引用
+	2）build段是xcodebuild的参数选择，目前只有configuration=Release/Debug的选择、
+	3）sign段是签名的证书和描述文件的选择，具体依赖ipapub项目里的定义
+	4）publish段用作正式发布的自动打包，使用服务器要求的真正发布的url使用的地址生成包
+	5）下面的其他字段是可以支持的配置文件的替换。目前支持plist字段和h头文件宏定义的替换。后续可以支持普通cfg以及使用xpath支持xml的替换
