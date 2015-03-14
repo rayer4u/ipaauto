@@ -131,6 +131,9 @@ def ipa_auto(label, pub, url):
         files['icons'] = (os.path.basename(pubs['iconsmallpath']), open(pubs['iconsmallpath'], 'rb'), 'image/png')
     if 'iconbigpath' in pubs:
         files['iconb'] = (os.path.basename(pubs['iconbigpath']), open(pubs['iconbigpath'], 'rb'), 'image/png')
+    #for use in plist
+    if 'idfix' not in gens:
+        gens['idfix'] = gens['id']+'ios8fix'
     plist = rule_repl.sub(lambda mt:gens[mt.group(2).lower()] if mt.group(2).lower() in gens else mt.group(1)+mt.group(2)+mt.group(3), pub_plist)
     files['plist'] = ('',plist)
     if label != "":
@@ -361,7 +364,7 @@ pub_plist="""<?xml version="1.0" encoding="UTF-8"?>
             </array><key>metadata</key>
                <dict>
                <key>bundle-identifier</key>
-               <string>{{id}}ios8fix</string>
+               <string>{{idfix}}</string>
                <key>bundle-version</key>
                <string>{{versionName}}</string>
                <key>kind</key>
