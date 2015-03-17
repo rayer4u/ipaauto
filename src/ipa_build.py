@@ -10,7 +10,7 @@ import sys
 def ipa_build(builds):
 
     rule = re.compile(r"^Validate (.*)\s*")
-    cmd = 'xcodebuild build -sdk iphoneos'+\
+    cmd = 'xcodebuild clean build -sdk iphoneos'+\
         ''.join(' -'+key+' '+str(value) for key,value in builds.items()) #CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
     print(cmd)
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, env=os.environ, shell=True)

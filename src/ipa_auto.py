@@ -59,10 +59,12 @@ def ipa_auto(label, pub, url):
     
     #copy dirs
     dst_dir = '.'
+    build_dir = '.'
     if 'copy_dirs' in sections:
         base_dir = cf.get('copy_dirs', 'BASE_DIR')
         replace_dir = cf.get('copy_dirs', 'REPLACE_DIR')
         tmp_dir = cf.get('copy_dirs', 'TMP_DIR')
+        
         if base_dir == '':
             print("BASE_DIR in %s must not null"%(cfg), file=sys.stderr)
             return
@@ -75,6 +77,8 @@ def ipa_auto(label, pub, url):
             dst_dir = tmp_dir
         else:
             dst_dir=base_dir
+        if 'build_dir' in dict(cf.items('copy_dirs')):
+            build_dir=cf.get('copy_dirs', 'BUILD_DIR')
         if replace_dir != '':
             print('dir replace %s to %s'%(replace_dir, dst_dir))
             print()
@@ -107,7 +111,7 @@ def ipa_auto(label, pub, url):
         return  
      
     #jump to dst_dir
-    os.chdir(dst_dir)
+    os.chdir(build_dir)
      
     #build 
     fn = ipa_build(builds)
