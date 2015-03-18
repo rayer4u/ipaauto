@@ -77,8 +77,10 @@ def ipa_auto(label, pub, url):
             dst_dir = tmp_dir
         else:
             dst_dir=base_dir
-        if 'build_dir' in dict(cf.items('copy_dirs')):
-            build_dir=cf.get('copy_dirs', 'BUILD_DIR')
+        if cf.has_option('copy_dirs', 'BUILD_DIR'):
+            build_dir = cf.get('copy_dirs', 'BUILD_DIR')
+        else:
+            build_dir = dst_dir
         if replace_dir != '':
             print('dir replace %s to %s'%(replace_dir, dst_dir))
             print()
@@ -266,16 +268,22 @@ def do_mlplayer_cfg(pn, options):
     try:
         tree = ET.parse(pn)
         for option_key,option_value in options.items():
-            elems = tree.findall(option_key)
+            if '|' in option_key:
+                elems = tree.findall(option_key.split('|')[0])
+            else:
+                elems = tree.findall(option_key)
             if elems is not None:
-                pairs = option_value.split('=')
                 key = ''
                 value = ''
-                if len(pairs)> 1:
-                    key = pairs[0]
-                    value = pairs[1].decode('utf-8')
-                else:
+                if '|' in option_key:
+                    key = option_key.split('|')[1]
                     value = option_value.decode('utf-8')
+                else:
+                    if '=' in option_value:
+                        key = option_value.split('=')[0]
+                        value = option_value.split('=')[1].decode('utf-8')
+                    else:
+                        value = option_value.decode('utf-8')
 
                 for ele in elems:
                     if key == '':

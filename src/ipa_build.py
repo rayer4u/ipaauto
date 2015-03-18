@@ -6,15 +6,18 @@ import re
 import subprocess
 import sys
 
+rule = re.compile(r"^Validate (.*)\s*")
+rule_define = re.compile(r"{%(\S+)%}")
 
 def ipa_build(builds):
 
-    rule = re.compile(r"^Validate (.*)\s*")
-    cmd = 'xcodebuild clean build -sdk iphoneos'+\
-        ''.join(' -'+key+' '+str(value) for key,value in builds.items()) #CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+    
+    cmd = 'xcodebuild -sdk iphoneos'+\
+        ''.join((' -'+key+' '+str(value) if not rule_define.match(key) else ' '+rule_define.match(key).group(1).upper()+'='+str(value)) for key,value in builds.items())+\
+        ' clean build' #CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
     print(cmd)
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, env=os.environ, shell=True)
-      
+
     path = ''
     while True:
         line = p.stdout.readline()
