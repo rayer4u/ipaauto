@@ -9,12 +9,13 @@ import sys
 rule = re.compile(r"^Validate (.*)\s*")
 rule_define = re.compile(r"{%(\S+)%}")
 
-def ipa_build(builds):
+def ipa_build(builds, con):
 
     
     cmd = 'xcodebuild -sdk iphoneos'+\
         ''.join((' -'+key+' '+str(value) if not rule_define.match(key) else ' '+rule_define.match(key).group(1).upper()+'='+str(value)) for key,value in builds.items())+\
-        ' clean build' #CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+        ' clean' if not con else '' +\
+        ' build' #CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
     print(cmd)
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, env=os.environ, shell=True)
 

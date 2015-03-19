@@ -25,7 +25,7 @@ from ipa_build import ipa_build
 from svn_getuser import getUser
 
 cfg = 'auto.cfg'
-def ipa_auto(label, pub, url):
+def ipa_auto(label, pub, url, con):
     cf = ConfigParser.SafeConfigParser()    
     cf.read(cfg)  
     
@@ -69,11 +69,12 @@ def ipa_auto(label, pub, url):
             print("BASE_DIR in %s must not null"%(cfg), file=sys.stderr)
             return
         if tmp_dir != '':
-            if os.path.exists(tmp_dir):
+            if not con and os.path.exists(tmp_dir):
                 shutil.rmtree(tmp_dir)
             print('dir move %s to %s'%(base_dir, tmp_dir))
             print()
-            shutil.copytree(base_dir, tmp_dir, ignore=None)
+            if not con:
+                shutil.copytree(base_dir, tmp_dir, ignore=None)
             dst_dir = tmp_dir
         else:
             dst_dir=base_dir
@@ -84,27 +85,28 @@ def ipa_auto(label, pub, url):
         if replace_dir != '':
             print('dir replace %s to %s'%(replace_dir, dst_dir))
             print()
-            replacetree(replace_dir, dst_dir)
-            
+            if not con:
+                replacetree(replace_dir, dst_dir)
         sections.remove('copy_dirs')
     
-    for section in sections:
-        options = dict(cf.items(section))
-        _,ext = os.path.splitext(section)
-        do_replace = do_unsupport
-        if ext != None:
-            if ext == '.plist':
-                #plist文件的替换
-                do_replace = do_plist
-            elif ext == '.h':
-                #h头文件define的替换
-                do_replace = do_h_define
-        if os.path.basename(section) == 'mlplayer.cfg':
-            do_replace = do_mlplayer_cfg
-        print(section)
-        repl(options, gens)
-        do_replace(os.path.join(dst_dir, section), options)
-        print()
+    if not con:
+        for section in sections:
+            options = dict(cf.items(section))
+            _,ext = os.path.splitext(section)
+            do_replace = do_unsupport
+            if ext != None:
+                if ext == '.plist':
+                    #plist文件的替换
+                    do_replace = do_plist
+                elif ext == '.h':
+                    #h头文件define的替换
+                    do_replace = do_h_define
+            if os.path.basename(section) == 'mlplayer.cfg':
+                do_replace = do_mlplayer_cfg
+            print(section)
+            repl(options, gens)
+            do_replace(os.path.join(dst_dir, section), options)
+            print()
 
     #获取user
     user = getUser()
@@ -116,7 +118,7 @@ def ipa_auto(label, pub, url):
     os.chdir(build_dir)
      
     #build 
-    fn = ipa_build(builds)
+    fn = ipa_build(builds, con)
     if fn == "":
         print("error build", file=sys.stderr)
         return
