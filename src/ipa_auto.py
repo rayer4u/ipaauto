@@ -217,6 +217,8 @@ def do_plist(pn, options):
             fw.write(line)
         ret = True
         
+        fw.flush()
+        os.fsync(fw.fileno())
         fw.close()
     except Exception as err:
         print("failed %s"%err, file=sys.stderr)
@@ -251,6 +253,8 @@ def do_h_define(pn, options):
 
         ret = True
         
+        fw.flush()
+        os.fsync(fw.fileno())
         fw.close()
     except Exception as err:
         print("failed %s"%err, file=sys.stderr)
