@@ -18,6 +18,7 @@ import tempfile
 import re
 import requests
 import json
+import time
 import xml.etree.ElementTree as ET 
 from time import gmtime, strftime
 
@@ -114,10 +115,12 @@ def ipa_auto(label, pub, url, con):
         print("error svn get user", file=sys.stderr)
         return  
      
-    #jump to dst_dir
+    #jump to build_dir
     os.chdir(build_dir)
      
     #build 
+    # TODO: 解决在部分mac机器上，可能出现的文件修改时间比pch生成时间晚的问题
+    time.sleep(3)
     fn = ipa_build(builds, con)
     if fn == "":
         print("error build", file=sys.stderr)
