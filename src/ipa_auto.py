@@ -106,7 +106,7 @@ def ipa_auto(label, pub, url, con):
                 do_replace = do_mlplayer_cfg
             print(section)
             repl(options, gens)
-            do_replace(os.path.join(dst_dir, section), options)
+            do_replace(os.path.join(build_dir, section), options)
             print()
 
     #获取user
@@ -119,7 +119,7 @@ def ipa_auto(label, pub, url, con):
     os.chdir(build_dir)
      
     #build 
-    # TODO: 解决在部分mac机器上，可能出现的文件修改时间比pch生成时间晚的问题
+    # TODO: 解决在部分mac机器上，可能出现的文件修改时间比pch生成时间晚，造成编译失败的问题
     time.sleep(3)
     fn = ipa_build(builds, con)
     if fn == "":
@@ -400,3 +400,4 @@ pub_plist="""<?xml version="1.0" encoding="UTF-8"?>
 </dict>
 </plist>
 """
+
