@@ -62,13 +62,13 @@ def ipa_auto(label, pub, url, con):
     dst_dir = '.'
     build_dir = '.'
     if 'copy_dirs' in sections:
-        base_dir = cf.get('copy_dirs', 'BASE_DIR')
-        replace_dir = cf.get('copy_dirs', 'REPLACE_DIR')
-        tmp_dir = cf.get('copy_dirs', 'TMP_DIR')
-        
-        if base_dir == '':
+        if not cf.has_option('copy_dirs', 'BASE_DIR'):
             print("BASE_DIR in %s must not null"%(cfg), file=sys.stderr)
             return
+        base_dir = cf.get('copy_dirs', 'BASE_DIR')
+        replace_dir = cf.get('copy_dirs', 'REPLACE_DIR') if cf.has_option('copy_dirs', 'REPLACE_DIR') else ''
+        tmp_dir = cf.get('copy_dirs', 'TMP_DIR') if cf.has_option('copy_dirs', 'TMP_DIR') else ''
+        
         if tmp_dir != '':
             if not con and os.path.exists(tmp_dir):
                 shutil.rmtree(tmp_dir)
@@ -79,10 +79,7 @@ def ipa_auto(label, pub, url, con):
             dst_dir = tmp_dir
         else:
             dst_dir=base_dir
-        if cf.has_option('copy_dirs', 'BUILD_DIR'):
-            build_dir = cf.get('copy_dirs', 'BUILD_DIR')
-        else:
-            build_dir = dst_dir
+	build_dir = cf.get('copy_dirs', 'BUILD_DIR') if cf.has_option('copy_dirs', 'BUILD_DIR') and cf.get('copy_dirs', 'BUILD_DIR') != '' else dst_dir
         if replace_dir != '':
             print('dir replace %s to %s'%(replace_dir, dst_dir))
             print()
