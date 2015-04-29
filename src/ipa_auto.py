@@ -25,10 +25,12 @@ from time import gmtime, strftime
 from ipa_build import ipa_build
 from svn_getuser import getUser
 
-cfg = 'auto.cfg'
-def ipa_auto(label, pub, url, con):
+def ipa_auto(label, pub, url, con, cfg):
     cf = ConfigParser.SafeConfigParser()    
-    cf.read(cfg)  
+    ret = cf.read(cfg)  
+    if len(ret) == 0:
+	print("wrong with open %s"%cfg, file=sys.stderr)
+	return
     
     sections = cf.sections();
     
@@ -116,8 +118,6 @@ def ipa_auto(label, pub, url, con):
     os.chdir(build_dir)
      
     #build 
-    # TODO: 解决在部分mac机器上，可能出现的文件修改时间比pch生成时间晚，造成编译失败的问题
-    time.sleep(3)
     fn = ipa_build(builds, con)
     if fn == "":
         print("error build", file=sys.stderr)

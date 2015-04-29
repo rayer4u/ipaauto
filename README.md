@@ -9,6 +9,8 @@ ipaauto主要实现，自动替换、配置，证书变更，以发布不同渠�
 
 ## 运行参数
 * **-publish** 这样会生成正式发布包。依赖**publish段**的*Url字段
+* **-continue** 会跳过前面的拷贝覆盖过程，直接进入xcodebuild
+* **_xxx** 会使用当前目录的auto_xxx.cfg命名的配置文件进行运行打包。xxx是任意有效的文件名称字符串。如无此项默认使用auto.cfg
 
 ## auto.cfg详解
 1. **general段**是通用设置，用于自动相关或者多处替换，比如id在这里定义了，其他段里使用{{ id }}就能引用。其中id、name、versionCode、versionName、signUrl是必须项。其他根据项目需求定义
