@@ -16,7 +16,7 @@ if __name__ == "__main__":
             pub = True
         if '-url' in sys.argv:
             url = sys.argv[sys.argv.index('-url') + 1]
-        if '-con' in sys.argv:
+        if any(a in sys.argv for a in ['-con', '-continue']):
             con = True
  	cfgs = [s for s in sys.argv if s.startswith('_')]
         if len(cfgs) > 0:
