@@ -19,16 +19,19 @@ import re
 import requests
 import json
 import time
+import traceback
 import xml.etree.ElementTree as ET 
 from time import gmtime, strftime
 
 from ipa_build import ipa_build
 from svn_getuser import getUser
 
-cfg = 'auto.cfg'
-def ipa_auto(label, pub, url, con):
-    cf = ConfigParser.SafeConfigParser()    
-    cf.read(cfg)  
+def ipa_auto(label, pub, url, con, cfg):
+    cf = ConfigParser.ConfigParser()    
+    ret = cf.read(cfg)  
+    if len(ret) == 0:
+	print("wrong with open %s"%cfg, file=sys.stderr)
+	return
     
     sections = cf.sections();
     
@@ -99,6 +102,9 @@ def ipa_auto(label, pub, url, con):
                 elif ext == '.h':
                     #h头文件define的替换
                     do_replace = do_h_define
+		elif ext == '.strings':
+		    #string资源文件的替换
+		    do_replace = do_strings
             if os.path.basename(section) == 'mlplayer.cfg':
                 do_replace = do_mlplayer_cfg
             print(section)
@@ -116,8 +122,6 @@ def ipa_auto(label, pub, url, con):
     os.chdir(build_dir)
      
     #build 
-    # TODO: 解决在部分mac机器上，可能出现的文件修改时间比pch生成时间晚，造成编译失败的问题
-    time.sleep(3)
     fn = ipa_build(builds, con)
     if fn == "":
         print("error build", file=sys.stderr)
@@ -180,6 +184,7 @@ rule_plistkey = re.compile(r"^\s*<key>(.*)</key>\s*")
 rule_plistvalue = re.compile(r"^(\s*<([A-Za-z0-9]+)>)(.*)(</\2>\s*)")
 rule_hdefine = re.compile(r"^(\s*#define\s+)([A-Za-z0-9\_]+)(\s+)(0?[A-Fa-f0-9]+|\@?(\").*?[^\\]?\5)(\s*.*\s*|\/{2}.*\s*)")
 rule_repl = re.compile(r"(\{\{)(.*)(\}\})")
+rule_strings = re.compile('(.*?)\s=\s(.*?);') 
 
 def repl(options, gens):
     for key,value in options.items():
@@ -267,6 +272,43 @@ def do_h_define(pn, options):
 
     fr.close()
     return ret
+
+def do_strings(pn, options):
+    keys = options.keys()
+ 
+    ret = False
+    fr = open(pn, 'rb')
+    fw = tempfile.NamedTemporaryFile(dir=os.path.dirname(pn), delete=False)
+    try:
+        while True:
+            line = fr.readline()
+            if line is None or line == '':
+                break;
+            mt = rule_strings.match(line)
+            if mt is not None:
+                if mt.group(1).lower() in keys:
+                    linen = mt.group(1)+' = '+options[mt.group(1)]+';\n'
+                    print(linen)
+                    line = linen
+            fw.write(line)
+
+        ret = True
+
+        fw.flush()
+        os.fsync(fw.fileno())
+        fw.close()
+    except:
+	traceback.print_exc(file=sys.stderr)
+
+    if ret:
+        os.remove(pn)
+        os.rename(fw.name, pn)
+    else:
+        os.remove(fw.name)
+
+    fr.close()
+    return ret
+
 
 def do_mlplayer_cfg(pn, options):
     ret = False

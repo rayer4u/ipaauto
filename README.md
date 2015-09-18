@@ -9,6 +9,8 @@ ipaauto主要实现，自动替换、配置，证书变更，以发布不同渠�
 
 ## 运行参数
 * **-publish** 这样会生成正式发布包。依赖**publish段**的*Url字段
+* **-continue** 会跳过前面的拷贝覆盖过程，直接进入xcodebuild
+* **_xxx** 会使用当前目录的auto_xxx.cfg命名的配置文件进行运行打包。xxx是任意有效的文件名称字符串。如无此项默认使用auto.cfg
 
 ## auto.cfg详解
 1. **general段**是通用设置，用于自动相关或者多处替换，比如id在这里定义了，其他段里使用{{ id }}就能引用。其中id、name、versionCode、versionName、signUrl是必须项。其他根据项目需求定义
@@ -23,12 +25,12 @@ ipaauto主要实现，自动替换、配置，证书变更，以发布不同渠�
    * iconBigPath 是发布plist的*full-size-image*字段所用到的图标的本地路径，**必填字段**
    * ipaUrl，iconSmallUrl，iconBigUrl是正式发布时所用的plist相应字段，plistUrl用于正式发布包里的plist文件名
 
-5. **其他字段**是可以支持的配置文件的替换。目前支持**plist字段**和**h头文件宏定义**的替换。后续可以支持普通cfg以及使用xpath支持xml的替换
+5. **其他字段**是可以支持的配置文件的替换。目前支持**plist字段**和**h头文件宏定义**和**strings**的替换。后续可以支持普通cfg以及使用xpath支持xml的替换
 
-## 编译问题
+## 问题
 * 如果编译时出现头文件预编译头文件过期的的问题，目前在xcode 6.1上有可能遇到。请在build段使用宏`{%GCC_PRECOMPILE_PREFIX_HEADER%}=NO`禁用预编译头文件
-* 如果出现证书问题，请`{%CODE_SIGN_IDENTITY%}= `和`{%CODE_SIGNING_REQUIRED%}=NO`表明在编译时不使用证书，这样完全在开发测不依赖证书描述文件，以避免多证书时的混乱
-
+* 如果编译时出现证书问题，请`{%CODE_SIGN_IDENTITY%}= `和`{%CODE_SIGNING_REQUIRED%}=NO`表明在编译时不使用证书，这样完全在开发测不依赖证书描述文件，以避免多证书时的混乱
+* 对于**Localizable.strings**这样的本地化文件，key的文字长度有限制，太长可能出现KeyError问题
 
 
 
