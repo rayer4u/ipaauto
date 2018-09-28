@@ -6,7 +6,7 @@ import re
 import subprocess
 import sys
 
-rule = re.compile(r"^Validate (.*)\s*")
+rule = re.compile(r"^Validate (\S*)\s*")
 rule_define = re.compile(r"{%(\S+)%}")
 
 def ipa_build(builds, con):
