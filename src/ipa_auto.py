@@ -143,6 +143,8 @@ def ipa_auto(label, pub, url, con, cfg):
         files['icons'] = (os.path.basename(pubs['iconsmallpath']), open(pubs['iconsmallpath'], 'rb'), 'image/png')
     if 'iconbigpath' in pubs:
         files['iconb'] = (os.path.basename(pubs['iconbigpath']), open(pubs['iconbigpath'], 'rb'), 'image/png')
+    if 'entitlements' in pubs:
+        files['entitlements'] = (os.path.basename(pubs['entitlements']), open(pubs['entitlements'], 'rb'), 'application/xml') 
     #for use in plist
     if 'idfix' not in gens:
         gens['idfix'] = gens['id']
